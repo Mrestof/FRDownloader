@@ -1,3 +1,54 @@
-<FRDRootWidget>:
+# Screens
+<FRDScreenManager>:
+    FRDMain:
+    FRDBrowse:
+
+
+<FRDMain>:
+    name: 'main'
+
+    AnchorLayout:
+        canvas.before:
+            Color:
+                rgb: app.dark_purple
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: [None, None]
+            size: 450, 550
+            spacing: 20
+
+            Label:
+                text: 'FaceRig Downloader'
+                font_size: 45
+            FRDButton:
+                text: 'Browse some avatars'
+                font_size: 25
+                on_release: app.root.current = 'browse'
+            FRDButton:
+                text: 'Exit'
+                font_size: 25
+                on_release: app.stop()
+
+
+<FRDBrowse>:
+    name: 'browse'
+
     Label:
-        text: 'UIX is still unfinished'
+        text: "UIX hasn't come here yet"
+
+
+# Widgets
+<FRDButton>:
+    canvas:
+        Color:
+            rgb: app.pink
+        Line:
+            width: 2
+            rectangle: self.x, self.y, self.width, self.height
+
+    background_normal: ''
+    background_color: app.dark_purple
