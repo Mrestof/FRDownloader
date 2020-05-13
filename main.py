@@ -16,7 +16,14 @@ class FRDMain(Screen):
 
 
 class FRDBrowse(Screen):
-    pass
+
+    def add_tile(self):
+        grid_layout = self.ids['items']
+        grid_layout.add_widget(FRDButton(
+            text='i\'m the new tile',
+            size_hint_y=None,
+            height=240
+        ))
 
 
 # todo make an FRDMyCollectionManager screen
