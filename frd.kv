@@ -24,6 +24,13 @@
             Label:
                 text: 'FaceRig Downloader'
                 font_size: 45
+                canvas.before:
+                    PushMatrix
+                    Rotate:
+                        angle: 10
+                        origin: self.center
+                canvas.after:
+                    PopMatrix
             FRDButton:
                 text: 'Browse some avatars'
                 font_size: 25
