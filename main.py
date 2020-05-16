@@ -1,4 +1,5 @@
 from kivy.app import App
+from kivy.core.window import Window
 
 from kivy.uix.button import Button
 from kivy.uix.screenmanager import Screen, ScreenManager
@@ -41,6 +42,7 @@ class FRDApp(App):
     pink = ListProperty([0.894, 0.247, 0.353, 1])
 
     def build(self):
+        Window.clearcolor = 0.106, 0.106, 0.184, 1
         return FRDScreenManager()
 
 
