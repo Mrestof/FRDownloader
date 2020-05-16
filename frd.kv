@@ -81,7 +81,7 @@
 
                 canvas.before:
                     Color:
-                        rgba: .1, .8, .4, .3
+                        rgba: app.dark_purple
                     Rectangle:
                         pos: self.pos
                         size: self.size
@@ -92,8 +92,73 @@
                 width: root.general_width
 
                 FRDButton:
-                    text: 'add an item to grid'
-                    on_press: root.add_tile()
+                    size_hint_x: .1
+                    font_size: 18
+                    text: 'Back'
+                    on_release:
+                        app.root.transition.direction = 'right'
+                        app.root.current = 'main'
+
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint_x: .21
+
+                    TextInput:
+                        background_color: app.dark_purple
+                        multiline: False
+                        foreground_color: [1] * 4
+                        cursor_color: app.pink
+                        hint_text: 'Search'
+                        size_hint_y: None
+                        height: 30
+
+                    FRDButton:
+                        w: 1
+                        text: 'Search'
+                        pos_hint: {'center_x': 0.5}
+                        size_hint_x: .6
+
+                Label:
+                    amount: 610
+                    first: 1
+                    last: 30
+
+                    color: [1] * 3 + [0.6]
+                    size_hint_x: .12
+                    text: f'showed {self.first}-{self.last}\nitems of {self.amount}'
+                    font_size: 12
+
+                Label:
+                    size_hint_x: .08
+                    text: 'Sort by:'
+                    font_size: 13
+
+                FRDSpinner:
+                    size_hint_x: .17
+                    text: 'Most Popular'
+                    font_size: 15
+                    color: app.pink
+                    background_normal: ''
+                    background_color: app.dark_purple
+                    values: 'Most Popular', 'Most Recent', 'Most Subscribed'
+
+                    on_text: print(f'text of {self} changed')
+
+                Label:
+                    size_hint_x: .15
+                    text: 'Over time period:'
+                    font_size: 13
+
+                FRDSpinner:
+                    size_hint_x: .17
+                    text: 'Today'
+                    font_size: 15
+                    color: app.pink
+                    background_normal: ''
+                    background_color: app.dark_purple
+                    values: 'Today', 'One Week', 'Three Months', 'Six Months', 'One Year', 'All Time'
+
+                    on_text: print(f'text of {self} changed')
 
             GridLayout:
                 id: items
@@ -132,3 +197,16 @@
 
     background_normal: ''
     background_color: app.dark_purple
+
+
+<FRDSpinnerOption>:
+    canvas:
+        Color:
+            rgba: app.light_blue
+        Line:
+            points: self.pos[0], self.pos[1] + self.height, self.pos[0] + self.width, self.pos[1] + self.height
+
+    background_normal: ''
+    background_color: app.dark_purple
+    font_size: 13
+    height: 28
