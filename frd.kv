@@ -31,10 +31,14 @@
                         origin: self.center
                 canvas.after:
                     PopMatrix
+
             FRDButton:
                 text: 'Browse some avatars'
                 font_size: 25
-                on_release: app.root.current = 'browse'
+                on_release:
+                    app.root.transition.direction = 'left'
+                    app.root.current = 'browse'
+
             FRDButton:
                 text: 'Exit'
                 font_size: 25
@@ -43,7 +47,7 @@
 
 <FRDBrowse>:
     name: 'browse'
-    general_width: 700
+    general_width: 750
 
     ScrollView:
         do_scroll_x: False
@@ -52,6 +56,8 @@
         scroll_wheel_distance: 40
         smooth_scroll_end: 10
         scroll_type: ['bars']
+        bar_color: app.pink[:3] + [.9]
+        bar_inactive_color: app.pink[:3] + [.2]
         bar_width: 8
 
         BoxLayout:
@@ -82,7 +88,7 @@
 
                 size_hint: None, None
                 pos_hint: {'center_x': 0.5}
-                height: 60
+                height: 50
                 width: root.general_width
 
                 FRDButton:
@@ -113,12 +119,16 @@
 
 # Widgets
 <FRDButton>:
+    # var w is used to scale button borders
+    w: 2
+
     canvas:
         Color:
-            rgb: app.pink
+            rgba: app.pink
         Line:
-            width: 2
-            rectangle: self.x, self.y, self.width, self.height
+            width: self.w
+            joint: 'miter'
+            rectangle: self.x + self.w, self.y + self.w, self.width - self.w * 2, self.height - self.w * 2
 
     background_normal: ''
     background_color: app.dark_purple
