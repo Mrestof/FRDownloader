@@ -217,7 +217,7 @@
     # todo fix positioning of tiles if the title or author strings are too big
     # place your image here in case if the image or rating of item hasn't downloaded
     logo: 'img/noimg.gif'
-    mark: 'img/norating.png'
+    rating: 'img/norating.png'
     title: 'default title'
     author: 'default author'
 
@@ -239,7 +239,7 @@
         height: self.width
 
     AsyncImage:
-        source: root.mark
+        source: root.rating
         size_hint: None, None
         height: 30
 

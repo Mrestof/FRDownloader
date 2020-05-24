@@ -2,10 +2,14 @@ import os
 import requests
 import tempfile
 import shutil
+
 from zipfile import ZipFile
+from bs4 import BeautifulSoup
+
+APP = 274920
 
 
-def get_link(item: int, app=274920) -> str:
+def get_link(item: int, app=APP) -> str:
     # online service for downloading steam workshop content
     url = 'http://steamworkshop.download/online/steamonline.php'
     data = {'item': item, 'app': app}
@@ -43,6 +47,35 @@ def download_and_place(url: str, path: str, item: int) -> str:
         shutil.move(path_to_character_dir, path)
 
     return f'{character_dir} was moved to the {path}'
+
+
+def parse(sort='trend', page=1, amount=30, days=7, app=APP):
+    data = {}
+    payload = {'appid': app, 'browsesort': sort, 'actualsort': sort, 'p': page, 'numperpage': amount}
+
+    if sort == 'trend':
+        payload['days'] = days
+
+    html = requests.get('https://steamcommunity.com/workshop/browse', params=payload)
+    soup = BeautifulSoup(html.text, 'html.parser')
+
+    logo_tags = soup.find_all('img', 'workshopItemPreviewImage')
+    logo_sources = [tag.get('src') for tag in logo_tags]
+    data['img_sources'] = logo_sources
+
+    rating_tags = soup.find_all('img', 'fileRating')
+    rating_sources = [tag.get('src') for tag in rating_tags]
+    data['rating_sources'] = rating_sources
+
+    title_tags = soup.find_all('div', 'workshopItemTitle')
+    title_texts = [tag.string for tag in title_tags]
+    data['title_texts'] = title_texts
+
+    author_tags = soup.find_all('div', 'workshopItemAuthorName')
+    author_texts = ['by ' + tag.a.string for tag in author_tags]
+    data['author_texts'] = author_texts
+
+    return data
 
 
 # debug stuff
