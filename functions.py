@@ -65,11 +65,12 @@ def download_and_place(url: str, path: str, item: int) -> str:
     return f'{character_dir} was moved to the {path}'
 
 
-def parse(sort='trend', page=1, amount=30, days=7, app=APP) -> dict:
+def parse(sort='trend', search='', page=1, amount=30, days=7, app=APP) -> dict:
     """
     Parse data for using in browse section of an FRDownloader.
 
     :param sort: the way items are sorted.
+    :param search: string to find in titles of items.
     :param page: number of page you are looking to.
     :param amount: amount of items in page.
     :param days: time period of showed items (only for trend sort)
@@ -79,6 +80,10 @@ def parse(sort='trend', page=1, amount=30, days=7, app=APP) -> dict:
 
     data = {}
     payload = {'appid': app, 'browsesort': sort, 'actualsort': sort, 'p': page, 'numperpage': amount}
+
+    if search:
+        payload['searchtext'] = search
+        payload['childpublishedfileid'] = 0
 
     if sort == 'trend':
         payload['days'] = days
