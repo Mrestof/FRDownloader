@@ -107,8 +107,8 @@ def parse(sort='trend', search='', page=1, amount=30, days=7, app=APP) -> dict:
     author_texts = ['by ' + tag.a.string for tag in author_tags]
     data['author_texts'] = author_texts
 
-    id_tags = soup.find_all('a', 'data-publishedfileid')
-    item_ids = [tag['data-publishedfileid'] for tag in id_tags]
+    id_tags = soup.find_all('a', 'ugc')
+    item_ids = [tag.get('data-publishedfileid') for tag in id_tags]
     data['item_ids'] = item_ids
 
     return data
