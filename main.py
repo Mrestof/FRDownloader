@@ -1,15 +1,24 @@
+import requests
 from functions import parse
 
 from kivy.app import App
 from kivy.core.window import Window
 
 from kivy.uix.widget import Widget
+from kivy.uix.label import Label
 from kivy.uix.button import Button
+from kivy.uix.popup import Popup
 from kivy.uix.spinner import Spinner, SpinnerOption
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.screenmanager import Screen, ScreenManager
 
 from kivy.properties import ListProperty
+
+# Consts
+DB_color = 0.086, 0.141, 0.278, 1
+LB_color = 0.122, 0.251, 0.408, 1
+DP_color = 0.106, 0.106, 0.184, 1
+P_color = 0.894, 0.247, 0.353, 1
 
 
 # Screens
@@ -24,7 +33,21 @@ class FRDMain(Screen):
 class FRDBrowse(Screen):
 
     def update_grid(self):
-        data = parse(self.sort, self.search, self.page, self.amount, self.days)
+        try:
+            data = parse(self.sort, self.search, self.page, self.amount, self.days)
+        except requests.exceptions.ConnectionError as err:
+            print(err)
+            data = {}
+
+            popup = Popup(title='Connection error!',
+                          title_size=18,
+                          separator_color=P_color,
+                          background='img/DB_color.png',
+                          content=Label(text='Check your network connection and try again later.'),
+                          size_hint=(None, None), size=(400, 140))
+
+            popup.open()
+
         data_packs = zip(*data.values())
 
         grid = self.ids['items']
@@ -75,13 +98,13 @@ class FRDItem(BoxLayout):
 
 
 class FRDApp(App):
-    dark_blue = ListProperty([0.086, 0.141, 0.278, 1])
-    light_blue = ListProperty([0.122, 0.251, 0.408, 1])
-    dark_purple = ListProperty([0.106, 0.106, 0.184, 1])
-    pink = ListProperty([0.894, 0.247, 0.353, 1])
+    dark_blue = ListProperty(DB_color)
+    light_blue = ListProperty(LB_color)
+    dark_purple = ListProperty(DP_color)
+    pink = ListProperty(P_color)
 
     def build(self):
-        Window.clearcolor = 0.106, 0.106, 0.184, 1
+        Window.clearcolor = DP_color
         return FRDScreenManager()
 
 
