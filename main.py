@@ -5,7 +5,6 @@ from kivy.app import App
 from kivy.core.window import Window
 
 from kivy.uix.widget import Widget
-from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 from kivy.uix.spinner import Spinner, SpinnerOption
@@ -33,25 +32,30 @@ class FRDMain(Screen):
 class FRDBrowse(Screen):
 
     def update_grid(self):
+        if self.page == 0:
+            self.page += 1
+            return 'Can\'t go to the 0 page'
+
+        info = self.ids['page_info']
+        grid = self.ids['items']
+
         try:
             data = parse(self.sort, self.search, self.page, self.amount, self.days)
         except requests.exceptions.ConnectionError as err:
             print(err)
-            data = {}
+            grid.clear_widgets()
 
-            popup = Popup(title='Connection error!',
-                          title_size=18,
-                          separator_color=P_color,
-                          background='img/DB_color.png',
-                          content=Label(text='Check your network connection and try again later.'),
-                          size_hint=(None, None), size=(400, 140))
-
+            popup = FRDPopup(title='Connection Error!')
+            popup.text = 'Check your network connection and try again later.'
             popup.open()
 
-        data_packs = zip(*data.values())
+            return 'Can\'t load the items because of connection issues'
 
-        grid = self.ids['items']
-        info = self.ids['page_info']
+        data_packs = list(zip(*data.values()))
+
+        if not data_packs:
+            self.page -= 1
+            return f'Can\'t go to the {self.page + 1} page'
 
         info_last = self.page * self.amount
         info_first = info_last - self.amount + 1
@@ -97,6 +101,11 @@ class FRDItem(BoxLayout):
     pass
 
 
+class FRDPopup(Popup):
+    pass
+
+
+# App
 class FRDApp(App):
     dark_blue = ListProperty(DB_color)
     light_blue = ListProperty(LB_color)
