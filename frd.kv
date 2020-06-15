@@ -114,17 +114,29 @@
                         size_hint_y: None
                         height: 30
 
-                    FRDButton:
-                        w: 1
-                        text: 'Search'
-                        pos_hint: {'center_x': 0.5}
-                        size_hint_x: .6
+                    BoxLayout:
+                        FRDButton:
+                            w: 1
+                            text: 'Search'
+                            size_hint_x: .6
 
-                        on_release:
-                            root.search = search_input.text
-                            root.page = 1
-                            root.update_grid()
-                            page.text = f'Page {root.page} of {root.last_page}'
+                            on_release:
+                                root.search = search_input.text
+                                root.page = 1
+                                root.update_grid()
+                                page.text = f'Page {root.page} of {root.last_page}'
+
+                        FRDButton:
+                            w: 1
+                            text: 'Clear'
+                            size_hint_x: .4
+
+                            on_release:
+                                search_input.text = ''
+                                root.search = ''
+                                root. page = 1
+                                root.update_grid()
+                                page.text = f'Page {root.page} of {root.last_page}'
 
                 Label:
                     id: page_info
