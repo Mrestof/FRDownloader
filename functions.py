@@ -109,7 +109,7 @@ def parse(sort='trend', search='', page=1, amount=30, days=7, app=APP) -> dict:
     items_data['author_texts'] = author_texts
 
     id_tags = soup.find_all('a', 'ugc')
-    item_ids = [tag.get('data-publishedfileid') for tag in id_tags]
+    item_ids = [int(tag.get('data-publishedfileid')) for tag in id_tags]
     items_data['item_ids'] = item_ids
 
     page_browse_div = soup.find('div', 'workshopBrowsePagingControls')
