@@ -31,6 +31,7 @@ class FRDMain(Screen):
 
 class FRDBrowse(Screen):
 
+    page: int
     last_page: int
 
     def update_grid(self):
@@ -78,7 +79,7 @@ class FRDBrowse(Screen):
         else:
             page_control.disabled = True
 
-        info.text = f'showed {data["additional"]["items_range"]}\nitems'
+        info.text = f'showed\n{data["additional"]["items_range"]}\nitems'
 
         grid.clear_widgets()
 
@@ -95,6 +96,27 @@ class FRDBrowse(Screen):
             item.item_id = tile[4]
 
             grid.add_widget(item)
+
+    def go_to(self, page):
+        try:
+            page = int(page)
+        except ValueError as err:
+            print(err)
+
+            popup = FRDPopup(title='Value Error!')
+            popup.text = 'Number of the page must be an integer, like 12'
+            popup.open()
+
+            return 'Error occurred, can\'t continue'
+
+        if 0 < page <= self.last_page:
+            if page != self.page:
+                self.page = page
+                self.update_grid()
+        else:
+            popup = FRDPopup(title='Value Error!')
+            popup.text = f'Number of the page must be in range from 1 to {self.last_page}'
+            popup.open()
 
 
 # todo make an FRDMyCollectionManager screen

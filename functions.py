@@ -119,12 +119,18 @@ def parse(sort='trend', search='', page=1, amount=30, days=7, app=APP) -> dict:
         print(error)
         if page_browse_div:
             page_tags = page_browse_div.find_all('a', 'pagelink')
-            last_page = page_tags[-1].string if page_tags else 0
+            last_page = page_tags[-1].string
             additional_data['last_page'] = int(last_page)
+    except IndexError as error:
+        print(error)
+        additional_data['last_page'] = 1
+    except AttributeError as error:
+        print(error)
 
-    items_per_page_raw = soup.find('div', 'workshopBrowsePagingInfo').string
-    items_per_page = items_per_page_raw.split(' ')[1]
-    additional_data['items_range'] = items_per_page
+    if item_ids:
+        items_per_page_raw = soup.find('div', 'workshopBrowsePagingInfo').string
+        items_per_page = items_per_page_raw.split(' ')[1]
+        additional_data['items_range'] = items_per_page
 
     return {'items': items_data, 'additional': additional_data}
 
