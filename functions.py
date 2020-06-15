@@ -78,7 +78,8 @@ def parse(sort='trend', search='', page=1, amount=30, days=7, app=APP) -> dict:
     :return: dictionary of parsed data: links for images, titles as a text and ids of the items (characters).
     """
 
-    data = {}
+    items_data = {}
+    additional_data = {}
     payload = {'appid': app, 'browsesort': sort, 'actualsort': sort, 'p': page, 'numperpage': amount}
 
     if search:
@@ -93,25 +94,39 @@ def parse(sort='trend', search='', page=1, amount=30, days=7, app=APP) -> dict:
 
     logo_tags = soup.find_all('img', 'workshopItemPreviewImage')
     logo_sources = [tag.get('src') for tag in logo_tags]
-    data['img_sources'] = logo_sources
+    items_data['img_sources'] = logo_sources
 
     rating_tags = soup.find_all('img', 'fileRating')
     rating_sources = [tag.get('src') for tag in rating_tags]
-    data['rating_sources'] = rating_sources
+    items_data['rating_sources'] = rating_sources
 
     title_tags = soup.find_all('div', 'workshopItemTitle')
     title_texts = [tag.string for tag in title_tags]
-    data['title_texts'] = title_texts
+    items_data['title_texts'] = title_texts
 
     author_tags = soup.find_all('div', 'workshopItemAuthorName')
-    author_texts = ['by ' + tag.a.string for tag in author_tags]
-    data['author_texts'] = author_texts
+    author_texts = ['by ' + str(tag.a.string) for tag in author_tags]
+    items_data['author_texts'] = author_texts
 
     id_tags = soup.find_all('a', 'ugc')
     item_ids = [tag.get('data-publishedfileid') for tag in id_tags]
-    data['item_ids'] = item_ids
+    items_data['item_ids'] = item_ids
 
-    return data
+    page_browse_div = soup.find('div', 'workshopBrowsePagingControls')
+    try:
+        additional_data['last_page'] = int(page_browse_div.contents[-3])
+    except ValueError as error:
+        print(error)
+        if page_browse_div:
+            page_tags = page_browse_div.find_all('a', 'pagelink')
+            last_page = page_tags[-1].string if page_tags else 0
+            additional_data['last_page'] = int(last_page)
+
+    items_per_page_raw = soup.find('div', 'workshopBrowsePagingInfo').string
+    items_per_page = items_per_page_raw.split(' ')[1]
+    additional_data['items_range'] = items_per_page
+
+    return {'items': items_data, 'additional': additional_data}
 
 
 # debug stuff

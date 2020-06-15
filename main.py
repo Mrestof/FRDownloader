@@ -31,13 +31,19 @@ class FRDMain(Screen):
 
 class FRDBrowse(Screen):
 
-    def update_grid(self):
-        if self.page == 0:
-            self.page += 1
-            return 'Can\'t go to the 0 page'
+    last_page: int
 
+    def update_grid(self):
         info = self.ids['page_info']
         grid = self.ids['items']
+        page_control = self.ids['page_control']
+        prev_page = self.ids['prev_page']
+        next_page = self.ids['next_page']
+
+        if self.page == 1:
+            prev_page.disabled = True
+        else:
+            prev_page.disabled = False
 
         try:
             data = parse(self.sort, self.search, self.page, self.amount, self.days)
@@ -51,15 +57,28 @@ class FRDBrowse(Screen):
 
             return 'Can\'t load the items because of connection issues'
 
-        data_packs = list(zip(*data.values()))
+        data_packs = list(zip(*data['items'].values()))
 
         if not data_packs:
-            self.page -= 1
-            return f'Can\'t go to the {self.page + 1} page'
+            popup = FRDPopup(title='Search Error!')
+            popup.text = 'Can\'t find any items with such search parameters'
+            popup.open()
 
-        info_last = self.page * self.amount
-        info_first = info_last - self.amount + 1
-        info.text = f'showed {info_first}-{info_last}\nitems'
+            return 'No data returned from parse function'
+
+        self.last_page = data['additional']['last_page']
+
+        if self.last_page:
+            page_control.disabled = False
+            print(self.page, self.last_page)
+            if self.page == self.last_page:
+                next_page.disabled = True
+            else:
+                next_page.disabled = False
+        else:
+            page_control.disabled = True
+
+        info.text = f'showed {data["additional"]["items_range"]}\nitems'
 
         grid.clear_widgets()
 
