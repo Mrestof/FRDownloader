@@ -38,7 +38,7 @@ def download_and_place(url: str, path: str, item: int, is_direct=False) -> dict:
     Download archive and unpacking it into the characters folder.
 
     :param url: link of the archive.
-    :param path: path where the FaceRig.exe is situated.
+    :param path: path where the FaceRig.exe is situated or direct path to characters folder.
     :param item: id of the item to be unpacked.
     :param is_direct: change to True if you want to enter direct path.
     :return: dictionary with message about where the files were moved to or with some error message.
@@ -48,7 +48,14 @@ def download_and_place(url: str, path: str, item: int, is_direct=False) -> dict:
     content = requests.get(url).content
 
     # compiling the destination path
-    path = path[:-4] + '/Mod/VP/PC_CustomData/Objects'
+    if os.path.isdir(path):
+        if not is_direct:
+            if path[-3:] == 'Bin':
+                path = path[:-4] + '/Mod/VP/PC_CustomData/Objects'
+            else:
+                return {'Path Error': 'Given path must end on "Bin"'}
+    else:
+        return {'Path Error': 'Given path is not a valid directory'}
 
     # creating temporary directory and unzipping archive
     with tempfile.TemporaryDirectory() as tmpdir:
