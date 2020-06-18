@@ -40,11 +40,13 @@ class FRDBrowse(Screen):
         prev_page = self.ids['prev_page']
         next_page = self.ids['next_page']
 
+        # disable possibility to go to the 0's page
         if self.page == 1:
             prev_page.disabled = True
         else:
             prev_page.disabled = False
 
+        # parse data from steam workshop
         try:
             data = parse(self.sort, self.search, self.page, self.amount, self.days)
         except requests.exceptions.ConnectionError as err:
@@ -57,6 +59,7 @@ class FRDBrowse(Screen):
 
             return 'Can\'t load the items because of connection issues'
 
+        # make list of lists for every character
         data_packs = list(zip(*data['items'].values()))
 
         if not data_packs:
@@ -68,6 +71,7 @@ class FRDBrowse(Screen):
 
         self.last_page = data['additional']['last_page']
 
+        # disable possibility to go to the page higher than maximum
         if self.last_page:
             page_control.disabled = False
             print(self.page, self.last_page)
@@ -80,8 +84,10 @@ class FRDBrowse(Screen):
 
         info.text = f'showed\n{data["additional"]["items_range"]}\nitems'
 
+        # clear grid from previous items and place new from the data_packs list
         grid.clear_widgets()
 
+        # little kludge for occasions in which on the page are only 1 or 2 items
         for _ in range(3):
             grid.add_widget(Widget())
 
@@ -97,6 +103,7 @@ class FRDBrowse(Screen):
             grid.add_widget(item)
 
     def go_to(self, page):
+        # check if page is an integer
         try:
             page = int(page)
         except ValueError as err:
@@ -108,6 +115,7 @@ class FRDBrowse(Screen):
 
             return 'Error occurred, can\'t continue'
 
+        # check if page is in the acceptable range
         if 0 < page <= self.last_page:
             if page != self.page:
                 self.page = page
@@ -131,6 +139,8 @@ class FRDSpinner(Spinner):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+        # change default option class of the spinner to custom
         self.option_cls = FRDSpinnerOption
 
 
@@ -187,6 +197,7 @@ class FRDApp(App):
     pink = ListProperty(P_color)
 
     def build(self):
+        # set the background color of the window
         Window.clearcolor = DP_color
         return FRDScreenManager()
 

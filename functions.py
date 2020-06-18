@@ -96,40 +96,50 @@ def parse(sort='trend', search='', page=1, amount=30, days=7, app=APP) -> dict:
     :return: dictionary of parsed data: links for images, titles as a text and ids of the items (characters).
     """
 
+    # create the data dicts that will be filled with parsed data and payload with given params
     items_data = {}
     additional_data = {}
     payload = {'appid': app, 'browsesort': sort, 'actualsort': sort, 'p': page, 'numperpage': amount}
 
+    # if given some search string, pass it to request
     if search:
         payload['searchtext'] = search
         payload['childpublishedfileid'] = 0
 
+    # if we sort not by trend we can't pass the amount of days to payload
     if sort == 'trend':
         payload['days'] = days
 
+    # get html page and make a beautiful soup from it
     html = requests.get('https://steamcommunity.com/workshop/browse', params=payload)
     soup = BeautifulSoup(html.text, 'html.parser')
 
+    # get links for item icons
     logo_tags = soup.find_all('img', 'workshopItemPreviewImage')
     logo_sources = [tag.get('src') for tag in logo_tags]
     items_data['img_sources'] = logo_sources
 
+    # get links for item rating images
     rating_tags = soup.find_all('img', 'fileRating')
     rating_sources = [tag.get('src') for tag in rating_tags]
     items_data['rating_sources'] = rating_sources
 
+    # get title of each item
     title_tags = soup.find_all('div', 'workshopItemTitle')
     title_texts = [tag.string for tag in title_tags]
     items_data['title_texts'] = title_texts
 
+    # get author of each item
     author_tags = soup.find_all('div', 'workshopItemAuthorName')
     author_texts = ['by ' + str(tag.a.string) for tag in author_tags]
     items_data['author_texts'] = author_texts
 
+    # get id of each item
     id_tags = soup.find_all('a', 'ugc')
     item_ids = [int(tag.get('data-publishedfileid')) for tag in id_tags]
     items_data['item_ids'] = item_ids
 
+    # get last possible page with such payload
     page_browse_div = soup.find('div', 'workshopBrowsePagingControls')
     try:
         additional_data['last_page'] = int(page_browse_div.contents[-3])
@@ -145,6 +155,7 @@ def parse(sort='trend', search='', page=1, amount=30, days=7, app=APP) -> dict:
     except AttributeError as error:
         print(error)
 
+    # get amount of items on the page
     if item_ids:
         items_per_page_raw = soup.find('div', 'workshopBrowsePagingInfo').string
         items_per_page = items_per_page_raw.split(' ')[1]
