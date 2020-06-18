@@ -305,6 +305,7 @@
 
 
 <FRDItem>:
+    # todo parse info about every item size and place it near "add to collection" button
     # todo fix positioning of tiles if the title or author strings are too big
     # place your image here in case if the image or rating of item hasn't downloaded
     logo: 'img/noimg.gif' # can be a link
@@ -353,7 +354,8 @@
         height: 40
 
         on_release:
-            print(root.item_id)
+            print('id of the item: ', root.item_id)
+            root.add_to_collection(app.path)
 
 
 <FRDPopup>:
@@ -363,11 +365,12 @@
     title_size: 18
     separator_color: app.pink
     background: 'img/DB_color.png'
-    size_hint: (None, None)
-    size: (400, 140)
+    size_hint: None, None
+    size: 400, 140
 
     Label:
         text: root.text
+        text_size: self.width, None
 
 
 <FRDTextInput@TextInput>:

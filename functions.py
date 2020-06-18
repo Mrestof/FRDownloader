@@ -21,23 +21,27 @@ def get_link(item: int, app=APP) -> str:
     url = 'http://steamworkshop.download/online/steamonline.php'
     data = {'item': item, 'app': app}
 
-    # todo check if request has sent (outside the function)
     # extracting the url of a file from server response and checking for some errors
     r = requests.post(url=url, data=data)
     assert len(r.text) > 120,\
         f'link for downloading was not received, try again later\nPOST request has returned: {r.text}'
 
+    # still trying to catch this rare bug
+    print(r.text)
+
     return r.text.split('\'')[1]
 
 
-def download_and_place(url: str, path: str, item: int) -> str:
+# todo split this function on two different: check path, download and place item
+def download_and_place(url: str, path: str, item: int, is_direct=False) -> dict:
     """
     Download archive and unpacking it into the characters folder.
 
     :param url: link of the archive.
     :param path: path where the FaceRig.exe is situated.
     :param item: id of the item to be unpacked.
-    :return: text message about where the files were moved to.
+    :param is_direct: change to True if you want to enter direct path.
+    :return: dictionary with message about where the files were moved to or with some error message.
     """
 
     # downloading content of a zip archive
@@ -48,8 +52,6 @@ def download_and_place(url: str, path: str, item: int) -> str:
 
     # creating temporary directory and unzipping archive
     with tempfile.TemporaryDirectory() as tmpdir:
-        print(tmpdir)
-
         with open(f'{tmpdir}/cont.zip', 'wb') as f:
             f.write(content)
 
@@ -62,7 +64,7 @@ def download_and_place(url: str, path: str, item: int) -> str:
 
         shutil.move(path_to_character_dir, path)
 
-    return f'{character_dir} was moved to the {path}'
+    return {'Success': f'{character_dir} was moved to the {path}'}
 
 
 def parse(sort='trend', search='', page=1, amount=30, days=7, app=APP) -> dict:

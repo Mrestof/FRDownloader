@@ -1,5 +1,5 @@
 import requests
-from functions import parse
+from functions import parse, get_link, download_and_place
 
 from kivy.app import App
 from kivy.core.window import Window
@@ -30,7 +30,6 @@ class FRDMain(Screen):
 
 
 class FRDBrowse(Screen):
-
     page: int
     last_page: int
 
@@ -62,7 +61,7 @@ class FRDBrowse(Screen):
 
         if not data_packs:
             popup = FRDPopup(title='Search Error!')
-            popup.text = 'Can\'t find any items with such search parameters'
+            popup.text = 'Can\'t find any items with such search parameters.'
             popup.open()
 
             return 'No data returned from parse function'
@@ -104,7 +103,7 @@ class FRDBrowse(Screen):
             print(err)
 
             popup = FRDPopup(title='Value Error!')
-            popup.text = 'Number of the page must be an integer, like 12'
+            popup.text = 'Number of the page must be an integer, like 12.'
             popup.open()
 
             return 'Error occurred, can\'t continue'
@@ -115,11 +114,12 @@ class FRDBrowse(Screen):
                 self.update_grid()
         else:
             popup = FRDPopup(title='Value Error!')
-            popup.text = f'Number of the page must be in range from 1 to {self.last_page}'
+            popup.text = f'Number of the page must be in range from 1 to {self.last_page}.'
             popup.open()
 
 
 # todo make an FRDMyCollectionManager screen
+# todo make an FRDSettings screen
 
 
 # Widgets
@@ -139,7 +139,39 @@ class FRDSpinnerOption(SpinnerOption):
 
 
 class FRDItem(BoxLayout):
-    pass
+
+    def add_to_collection(self, path: str):
+        # get link for archive to download, check for some exceptions, try to download the item and throw the
+        # popup with status message
+        if path:
+            try:
+                download_link = get_link(self.item_id)
+            except requests.exceptions.ConnectionError as err:
+                print(err)
+                popup = FRDPopup(title='Connection Error!')
+                popup.text = 'Check your internet connection and try again later.'
+                popup.open()
+            except AssertionError as err:
+                print(err)
+                popup = FRDPopup(title='Server Error!')
+                popup.text = 'Something went wrong on the server, try again later.'
+                popup.open()
+            else:
+                info = download_and_place(download_link, path, self.item_id)
+                key = list(info.keys())[0]
+
+                if key == "Success":
+                    popup = FRDPopup(title='Success!')
+                    popup.text = info['Success']
+                else:
+                    popup = FRDPopup(title=f'{key}!')
+                    popup.text = info[key]
+
+                popup.open()
+        else:
+            popup = FRDPopup(title='Path Error!')
+            popup.text = 'Path of the game not found, enter it on settings page.'
+            popup.open()
 
 
 class FRDPopup(Popup):
@@ -148,6 +180,7 @@ class FRDPopup(Popup):
 
 # App
 class FRDApp(App):
+    path = ''
     dark_blue = ListProperty(DB_color)
     light_blue = ListProperty(LB_color)
     dark_purple = ListProperty(DP_color)
