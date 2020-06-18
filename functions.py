@@ -65,11 +65,20 @@ def download_and_place(url: str, path: str, item: int, is_direct=False) -> dict:
             with ZipFile(f'{tmpdir}/cont.zip') as zip_obj:
                 zip_obj.extractall(f'{tmpdir}')
 
-        # moving character dir to FaceRig characters directory
-        character_dir = os.listdir(f'{tmpdir}/{item}')[0]
+        # checking if there are any files in it, checking character dir and moving it into FaceRig characters directory
+        character_dir_info = next(os.walk(f'{tmpdir}/{item}'))
+
+        if character_dir_info[1]:
+            character_dir = character_dir_info[1][0]
+        else:
+            return {'Item Error': 'This item is unavailable, it has no files inside'}
+
         path_to_character_dir = f'{tmpdir}/{item}/{character_dir}'
 
-        shutil.move(path_to_character_dir, path)
+        if character_dir not in next(os.walk(path))[1]:
+            shutil.move(path_to_character_dir, path)
+        else:
+            return {'Item Error': 'Already have this item in collection, can\'t move duplicate character'}
 
     return {'Success': f'{character_dir} was moved to the {path}'}
 
