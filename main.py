@@ -11,7 +11,7 @@ from kivy.uix.spinner import Spinner, SpinnerOption
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.screenmanager import Screen, ScreenManager
 
-from kivy.properties import ListProperty
+from kivy.properties import ListProperty, BooleanProperty, StringProperty
 
 # Consts
 DB_color = 0.086, 0.141, 0.278, 1
@@ -126,6 +126,10 @@ class FRDBrowse(Screen):
             popup.open()
 
 
+class FRDSettings(Screen):
+    pass
+
+
 # todo make an FRDMyCollectionManager screen
 # todo make an FRDSettings screen
 
@@ -150,7 +154,7 @@ class FRDSpinnerOption(SpinnerOption):
 
 class FRDItem(BoxLayout):
 
-    def add_to_collection(self, path: str):
+    def add_to_collection(self, path: str, is_direct: bool):
         # get link for archive to download, check for some exceptions, try to download the item and throw the
         # popup with status message
         if path:
@@ -167,7 +171,7 @@ class FRDItem(BoxLayout):
                 popup.text = 'Something went wrong on the server, try again later.'
                 popup.open()
             else:
-                info = download_and_place(download_link, path, self.item_id)
+                info = download_and_place(download_link, path, self.item_id, is_direct)
                 key = list(info.keys())[0]
 
                 if key == "Success":
@@ -190,7 +194,8 @@ class FRDPopup(Popup):
 
 # App
 class FRDApp(App):
-    path = ''
+    path = StringProperty('')
+    is_direct = BooleanProperty(False)
     dark_blue = ListProperty(DB_color)
     light_blue = ListProperty(LB_color)
     dark_purple = ListProperty(DP_color)
