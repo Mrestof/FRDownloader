@@ -5,6 +5,7 @@ import shutil
 
 from zipfile import ZipFile
 from bs4 import BeautifulSoup
+from configparser import ConfigParser
 
 APP = 274920
 
@@ -32,30 +33,38 @@ def get_link(item: int, app=APP) -> str:
     return r.text.split('\'')[1]
 
 
-# todo split this function on two different: check path, download and place item
-def download_and_place(url: str, path: str, item: int, is_direct=False) -> dict:
+def compile_path(path: str, is_direct=False) -> dict:
+    """
+    Compile the path in which all items will be stored.
+
+    :param path: path where the FaceRig.exe is situated or direct path to characters folder.
+    :param is_direct: change to True if you want to enter direct path.
+    :return: dictionary with final path or with an error.
+    """
+    # compiling the destination path
+    if os.path.isdir(path):
+        if not is_direct:
+            if path[-3:] == 'Bin':
+                return {'Success': os.path.join(os.path.split(path)[0], 'Mod/VP/PC_CustomData/Objects')}
+            else:
+                return {'Path Error': 'Given path must end on "Bin"'}
+        else:
+            return {'Success': path}
+    else:
+        return {'Path Error': 'Given path is not a valid directory'}
+
+
+def download_and_place(url: str, path: str, item: int) -> dict:
     """
     Download archive and unpacking it into the characters folder.
 
     :param url: link of the archive.
     :param path: path where the FaceRig.exe is situated or direct path to characters folder.
     :param item: id of the item to be unpacked.
-    :param is_direct: change to True if you want to enter direct path.
     :return: dictionary with message about where the files were moved to or with some error message.
     """
-
     # downloading content of a zip archive
     content = requests.get(url).content
-
-    # compiling the destination path
-    if os.path.isdir(path):
-        if not is_direct:
-            if path[-3:] == 'Bin':
-                path = path[:-4] + '/Mod/VP/PC_CustomData/Objects'
-            else:
-                return {'Path Error': 'Given path must end on "Bin"'}
-    else:
-        return {'Path Error': 'Given path is not a valid directory'}
 
     # creating temporary directory and unzipping archive
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -83,6 +92,57 @@ def download_and_place(url: str, path: str, item: int, is_direct=False) -> dict:
     return {'Success': f'{character_dir} was moved to the {path}'}
 
 
+def get_config_path() -> str:
+    """
+    Check OS and set the correct path for config.ini.
+
+    :return: path where the config.ini file must be stored.
+    """
+    if os.name == 'nt':
+        return os.path.join(os.environ['APPDATA'], 'FRDownloader')
+    else:
+        return os.path.join(os.environ['HOME'], '.FRDownloader')
+
+
+def save_path_to_config(path: str):
+    """
+    Save path to the config.ini.
+
+    :param path: path where items must be stored.
+    :return: nothing.
+    """
+    config_path = get_config_path()
+
+    if not os.path.isdir(config_path):
+        os.mkdir(config_path)
+
+    # set the path for config.ini
+    config = ConfigParser()
+    config['MAIN'] = {'path': path}
+
+    # save the path to config.ini
+    with open(os.path.join(config_path, 'config.ini'), 'w') as configfile:
+        config.write(configfile)
+
+
+def get_path_from_config() -> str:
+    """
+    Get path where items must be stored from config.ini.
+
+    :return: path where items must be stored.
+    """
+    config_path = get_config_path()
+    config_ini = os.path.join(config_path, 'config.ini')
+
+    if not os.path.isfile(config_ini):
+        return ''
+
+    config = ConfigParser()
+    config.read(config_ini)
+
+    return config['MAIN']['path']
+
+
 def parse(sort='trend', search='', page=1, amount=30, days=7, app=APP) -> dict:
     """
     Parse data for using in browse section of an FRDownloader.
@@ -91,8 +151,8 @@ def parse(sort='trend', search='', page=1, amount=30, days=7, app=APP) -> dict:
     :param search: string to find in titles of items.
     :param page: number of page you are looking to.
     :param amount: amount of items in page.
-    :param days: time period of showed items (only for trend sort)
-    :param app: id of the app (default is 274920)
+    :param days: time period of showed items (only for trend sort).
+    :param app: id of the app (default is 274920).
     :return: dictionary of parsed data: links for images, titles as a text and ids of the items (characters).
     """
 

@@ -1,5 +1,5 @@
 import requests
-from functions import parse, get_link, download_and_place
+from functions import parse, get_link, download_and_place, compile_path, save_path_to_config, get_path_from_config
 
 from kivy.app import App
 from kivy.core.window import Window
@@ -127,11 +127,29 @@ class FRDBrowse(Screen):
 
 
 class FRDSettings(Screen):
-    pass
+
+    @staticmethod
+    def save_path(path: str, is_direct: bool):
+        path = compile_path(path, is_direct)
+        key = list(path.keys())[0]
+
+        # if path compiled successfully, save it to config.ini
+        if key == 'Success':
+            FRDApp.path = path['Success']
+
+            save_path_to_config(FRDApp.path)
+
+            popup = FRDPopup(title=f'{key}!')
+            popup.text = f'New path where items will be placed is: {path[key]}'
+            popup.open()
+
+        else:
+            popup = FRDPopup(title=f'{key}!')
+            popup.text = path[key]
+            popup.open()
 
 
 # todo make an FRDMyCollectionManager screen
-# todo make an FRDSettings screen
 
 
 # Widgets
@@ -154,7 +172,7 @@ class FRDSpinnerOption(SpinnerOption):
 
 class FRDItem(BoxLayout):
 
-    def add_to_collection(self, path: str, is_direct: bool):
+    def add_to_collection(self, path: str):
         # get link for archive to download, check for some exceptions, try to download the item and throw the
         # popup with status message
         if path:
@@ -171,7 +189,7 @@ class FRDItem(BoxLayout):
                 popup.text = 'Something went wrong on the server, try again later.'
                 popup.open()
             else:
-                info = download_and_place(download_link, path, self.item_id, is_direct)
+                info = download_and_place(download_link, path, self.item_id)
                 key = list(info.keys())[0]
 
                 if key == "Success":
@@ -202,8 +220,12 @@ class FRDApp(App):
     pink = ListProperty(P_color)
 
     def build(self):
+        # set path to items on app initialisation
+        self.path = get_path_from_config()
+
         # set the background color of the window
         Window.clearcolor = DP_color
+
         return FRDScreenManager()
 
 

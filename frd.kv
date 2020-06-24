@@ -310,13 +310,6 @@
                     app.root.transition.direction = 'right'
                     app.root.current = 'main'
 
-            FRDButton:
-                text: 'path'
-                size_hint: None, None
-                size: 80, 40
-                on_release: print(app.path, app.is_direct)
-
-
             BoxLayout:
                 spacing: 10
                 size_hint_y: None
@@ -355,7 +348,8 @@
                         app.path = path_input.text
                         if is_direct.active: app.is_direct = True
                         else: app.is_direct = False
-                        # todo save path to config file
+
+                        root.save_path(app.path, app.is_direct)
 
 
 # Widgets
@@ -439,7 +433,7 @@
 
         on_release:
             print('id of the item: ', root.item_id)
-            root.add_to_collection(app.path, app.is_direct)
+            root.add_to_collection(app.path)
 
 
 <FRDPopup>:
