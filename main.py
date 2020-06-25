@@ -1,3 +1,4 @@
+import os
 import requests
 from functions import parse, get_link, download_and_place, compile_path, save_path_to_config, get_path_from_config
 
@@ -140,7 +141,7 @@ class FRDSettings(Screen):
             save_path_to_config(FRDApp.path)
 
             popup = FRDPopup(title=f'{key}!')
-            popup.text = f'New path where items will be placed is: {path[key]}'
+            popup.text = f'New path where items will be placed is: {path[key]}.'
             popup.open()
 
         else:
@@ -175,7 +176,7 @@ class FRDItem(BoxLayout):
     def add_to_collection(self, path: str):
         # get link for archive to download, check for some exceptions, try to download the item and throw the
         # popup with status message
-        if path:
+        if os.path.isdir(path):
             try:
                 download_link = get_link(self.item_id)
             except requests.exceptions.ConnectionError as err:
@@ -202,7 +203,7 @@ class FRDItem(BoxLayout):
                 popup.open()
         else:
             popup = FRDPopup(title='Path Error!')
-            popup.text = 'Path of the game not found, enter it on settings page.'
+            popup.text = 'Path of the game not found or not correct, enter it on settings page.'
             popup.open()
 
 

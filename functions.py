@@ -35,7 +35,7 @@ def get_link(item: int, app=APP) -> str:
 
 def compile_path(path: str, is_direct=False) -> dict:
     """
-    Compile the path in which all items will be stored.
+    Check if path is correct and compile the path in which all items will be stored.
 
     :param path: path where the FaceRig.exe is situated or direct path to characters folder.
     :param is_direct: change to True if you want to enter direct path.
@@ -47,11 +47,11 @@ def compile_path(path: str, is_direct=False) -> dict:
             if path[-3:] == 'Bin':
                 return {'Success': os.path.join(os.path.split(path)[0], 'Mod/VP/PC_CustomData/Objects')}
             else:
-                return {'Path Error': 'Given path must end on "Bin"'}
+                return {'Path Error': 'Given path must end on "Bin".'}
         else:
             return {'Success': path}
     else:
-        return {'Path Error': 'Given path is not a valid directory'}
+        return {'Path Error': 'Given path is not a valid directory.'}
 
 
 def download_and_place(url: str, path: str, item: int) -> dict:
@@ -80,16 +80,16 @@ def download_and_place(url: str, path: str, item: int) -> dict:
         if character_dir_info[1]:
             character_dir = character_dir_info[1][0]
         else:
-            return {'Item Error': 'This item is unavailable, it has no files inside'}
+            return {'Item Error': 'This item is unavailable, it has no files inside.'}
 
         path_to_character_dir = f'{tmpdir}/{item}/{character_dir}'
 
         if character_dir not in next(os.walk(path))[1]:
             shutil.move(path_to_character_dir, path)
         else:
-            return {'Item Error': 'Already have this item in collection, can\'t move duplicate character'}
+            return {'Item Error': 'Already have this item in collection, can\'t move duplicate character.'}
 
-    return {'Success': f'{character_dir} was moved to the {path}'}
+    return {'Success': f'{character_dir} was moved to the {path}.'}
 
 
 def get_config_path() -> str:

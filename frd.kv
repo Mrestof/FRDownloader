@@ -299,6 +299,7 @@
             orientation: 'vertical'
             size_hint: None, None
             size: 800, self.minimum_height
+            spacing: 20
             padding: 20
 
             FRDButton:
@@ -310,10 +311,18 @@
                     app.root.transition.direction = 'right'
                     app.root.current = 'main'
 
+            Label:
+                id: current_path
+
+                font_size: 20
+                text: f'Current path: {app.path}'
+                size_hint: None, None
+                size: self.texture_size
+
             BoxLayout:
                 spacing: 10
                 size_hint_y: None
-                height: 80
+                height: 40
 
                 Label:
                     text: 'Enter path to the FaceRig.exe\n(or direct path where the new items will be placed)'
@@ -346,6 +355,7 @@
 
                     on_release:
                         app.path = path_input.text
+                        current_path.text = f'Current path: {app.path}'
                         if is_direct.active: app.is_direct = True
                         else: app.is_direct = False
 
