@@ -408,11 +408,13 @@
     height: self.minimum_height
 
     AsyncImage:
+        nocache: True
         source: root.logo
         size_hint_y: None
         height: self.width
 
     AsyncImage:
+        nocache: True
         source: root.rating
         size_hint: None, None
         height: 30
