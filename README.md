@@ -8,6 +8,8 @@ To run FRDownloader in main/graphical mode, run: `python main.py`
 
 ### User manual
 
+link for video manual - https://youtu.be/Ld_0aaXeBB0
+
 0. Stop your antivirus, 'cause it can crash the app sometimes
 1. Download the app
 2. Unzip all files in some directory
