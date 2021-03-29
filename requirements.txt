@@ -33,7 +33,7 @@ ptyprocess==0.6.0
 pycodestyle==2.5.0
 pyflakes==2.1.1
 pygame==1.9.6
-Pygments==2.6.1
+Pygments==2.7.4
 pytoml==0.1.21
 requests==2.23.0
 sh==1.12.14
